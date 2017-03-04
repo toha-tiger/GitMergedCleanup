@@ -1,0 +1,24 @@
+<div class="">
+  <div class="col-sm-4 col-md-4">
+    <form method="POST">
+    <div class="form-group" style="overflow: auto; max-height: calc(100vh - 115px);">
+    {{#each branches}}
+      <div class="checkbox">
+        <label class="branch">
+          <input type="checkbox" name="{{name}}"><span class="title">{{title}}</span>
+        </label>
+      </div>
+    {{/each}}
+    </div>
+    <input class="btn btn-info select-all" type="button" value="all">
+    <input class="btn btn-info select-local" type="button" value="local">
+    <input class="btn btn-info select-remote" type="button" value="remote">
+    <input class="btn btn-default" type="reset" value="Reset">
+    <input class="btn btn-default" type="submit" value="Submit">
+    </form>
+  </div>
+  <div class="col-sm-8 col-md-8 preview">
+    <div class="info"><span class="status"></span><span class="issue"></span></div>
+    <iframe style="display: none;width: 100%;height: calc(100vh - 100px);margin-left: -15px;margin-right: -15px;"></iframe>
+  </div>
+</div>
