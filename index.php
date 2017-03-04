@@ -38,8 +38,9 @@ function execGit($command) {
 function formatBranches(array $data) {
   $result = [];
   if(!empty($data)) {
+    $data = array_map(trim, $data);
+    $data = array_diff($data, SKIP_BRANCHES);
     foreach($data as $out) {
-      $out = trim($out);
       $branch = ['name' => $out, 'title' => str_replace('_', ' ', $out)];
       $result[] = $branch;
     }
