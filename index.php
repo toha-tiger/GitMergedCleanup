@@ -63,7 +63,11 @@ function processPOST($post) {
   $result = ['errors' => []];
   pclose(popen(LOAD_KEY_CMD, 'r'));
 
-  foreach($post as $key => $val) {
+  if (!isset($post['branches'])) {
+    return ['errors' => ['no branches']];
+  }
+
+  foreach($post['branches'] as $key => $val) {
     $remoteBranch = false;
     if (preg_match('|^origin/|', $key)) {
       $remoteBranch = true;
