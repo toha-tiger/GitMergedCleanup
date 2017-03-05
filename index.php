@@ -1,23 +1,7 @@
 <?php
-
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 use Handlebars\Handlebars;
-
-$handlebars = new Handlebars(array(
-  'loader' => new \Handlebars\Loader\FilesystemLoader(__DIR__ . '/templates/', ['extension' => 'html']),
-  'partials_loader' => new \Handlebars\Loader\FilesystemLoader(
-    __DIR__ . '/templates/', [
-      'prefix' => '_'
-    , 'extension' => 'html'
-    ])
-));
-
-const GIT_CMD = '"c:\\Program Files\\Git\\bin\\git.exe"';
-const PROJECT_PATH = 'c:\\www\\jobvector\\';
-const SKIP_BRANCHES = ['origin/production', 'origin/master'];
-
-//get local merged branches
-chdir(PROJECT_PATH);
 
 function execGit($command) {
   $command = GIT_CMD . ' ' . trim($command) . ' 2>&1';
@@ -41,7 +25,11 @@ function formatBranches(array $data) {
     $data = array_map(trim, $data);
     $data = array_diff($data, SKIP_BRANCHES);
     foreach($data as $out) {
-      $branch = ['name' => $out, 'title' => str_replace('_', ' ', $out)];
+      $issue = '';
+      if (preg_match(REG_JIRA_ISSUE, $out, $match)) {
+        $issue = $match[0];
+      }
+      $branch = ['name' => $out, 'title' => str_replace('_', ' ', $out), 'issue' => $issue];
       $result[] = $branch;
     }
   }
@@ -50,7 +38,7 @@ function formatBranches(array $data) {
 }
 
 function processStart() {
-  $data = ['branches' => [], 'errors' => []];
+  $data = ['branches' => [], 'errors' => [], 'jiraUrl' => JIRA_URL];
 
   $localBranches = execGit('branch --merged origin/master');
   if (!isset($localBranches['errors'])) {
@@ -71,11 +59,26 @@ function processStart() {
 function processPOST($post) {
   $branches = [];
   $result = ['errors' => []];
+  pclose(popen(LOAD_KEY_CMD, 'r'));
 
   foreach($post as $key => $val) {
+    $remoteBranch = false;
+    if (preg_match('|^origin/|', $key)) {
+      $remoteBranch = true;
+      $key = str_replace('origin/', '', $key);
+    }
+    if (!preg_match(REG_VALID_BRANCH, $key)) {
+      $result['errors'] = array_merge($result['errors'], ['Incorrect branch name ' . $key]);
+      continue;
+    }
     if ($val == 'on') {
-      $branches[] = $key;
-      $res = execGit('branch --delete ' . $key);
+      if ($remoteBranch) {
+        $branches[] = 'origin/' . $key;
+        $res = execGit('push origin --delete ' . $key);
+      } else {
+        $branches[] = $key;
+        $res = execGit('branch --delete ' . $key);
+      }
       if (isset($res['errors'])) {
         $result['errors'] = array_merge($result['errors'], $res['errors']);
       }
@@ -84,6 +87,9 @@ function processPOST($post) {
 
   return ['processed' => formatBranches($branches), 'errors' => $result['errors']];
 }
+
+
+chdir(PROJECT_PATH);
 
 $subTemplate;
 $data;
@@ -95,6 +101,15 @@ if (empty($_POST)) {
   $subTemplate = 'processed';
   $data = processPOST($_POST);
 }
+
+$handlebars = new Handlebars(array(
+  'loader' => new \Handlebars\Loader\FilesystemLoader(__DIR__ . '/templates/', ['extension' => 'html']),
+  'partials_loader' => new \Handlebars\Loader\FilesystemLoader(
+    __DIR__ . '/templates/', [
+      'prefix' => '_'
+    , 'extension' => 'html'
+    ])
+));
 
 $handlebars->registerPartial('block', $subTemplate);
 $data['raw'] = htmlentities(print_r($data, true));

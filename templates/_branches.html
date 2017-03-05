@@ -5,7 +5,7 @@
     {{#each branches}}
       <div class="checkbox">
         <label class="branch">
-          <input type="checkbox" name="{{name}}"><span class="title">{{title}}</span>
+          <input type="checkbox" name="{{name}}" data-issue="{{issue}}"><span class="title">{{title}}</span>
         </label>
       </div>
     {{/each}}
@@ -18,7 +18,10 @@
     </form>
   </div>
   <div class="col-sm-8 col-md-8 preview">
-    <div class="info"><span class="status"></span><span class="issue"></span></div>
+    <div class="info"><span class="status"></span> <span class="issue"></span></div>
     <iframe style="display: none;width: 100%;height: calc(100vh - 100px);margin-left: -15px;margin-right: -15px;"></iframe>
   </div>
 </div>
+<script type="text/javascript">
+  var jiraUrl = '{{jiraUrl}}';
+</script>

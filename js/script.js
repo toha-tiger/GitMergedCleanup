@@ -1,7 +1,5 @@
 $(document).ready(function() {
 
-  var jiraUrl = 'https://jira.capsid.com/browse/';
-
   $('.select-all').click(function() {
     $('form .branch input').prop('checked', true);
   });
@@ -27,25 +25,23 @@ $(document).ready(function() {
   });
 
   $('form .branch span.title').click(function(e) {
-//    e.stopPropagation();
-//    e.preventDefault();
-    var issue = $(this).parent().find('input').attr('name').match(/JOB-\d{4,5}/);
-    if (issue) {
-      $('.preview .info .status').text('loading ');
-      $('.preview .info .issue').text(issue[0]);
-      var src = jiraUrl + issue;
-      if ($('.preview iframe').attr('src') != src) {
-        $('.preview iframe').attr('src', src);
-      }
+    var src, status, text;
+    var issue = $(this).parent().find('input').attr('data-issue');
+    if (issue.length) {
+      src = jiraUrl + issue;
+      status = 'loading ';
+      text = issue;
       $('.preview iframe').show();
     } else {
-      $('.preview .info .status').text('');
-      $('.preview .info .issue').text('not an issue');
+      src = '';
+      status = '';
+      text = 'not an Jira issue';
       $('.preview iframe').hide();
-      var src = '';
-      if ($('.preview iframe').attr('src') != src) {
-        $('.preview iframe').attr('src', src);
-      }
+    }
+    $('.preview .info .issue').text(text);
+    if ($('.preview iframe').attr('src') != src) {
+      $('.preview .info .status').text(status);
+      $('.preview iframe').attr('src', src);
     }
   });
 

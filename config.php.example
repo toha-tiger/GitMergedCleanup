@@ -1,0 +1,11 @@
+<?php
+
+const GIT_CMD = '"c:\\Program Files\\Git\\bin\\git.exe"';
+const LOAD_KEY_CMD = 'start /b "pagent" "c:\\Program Files (x86)\\PuTTY\\pageant.exe" c:\Users\user\Documents\repo.ppk';
+const PROJECT_PATH = 'c:\\www\\project\\';
+const SKIP_BRANCHES = ['origin/production', 'origin/master', 'origin/HEAD -> origin/master'];
+
+const REG_VALID_BRANCH = '/^[a-zA-Z0-9_\-#]+$/i';
+const REG_JIRA_ISSUE = '/ISSUE-\d{4,5}/';
+
+const JIRA_URL = 'https://jira.somedomain.com/browse/';
