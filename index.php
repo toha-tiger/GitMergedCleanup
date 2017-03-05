@@ -1,4 +1,6 @@
 <?php
+set_time_limit(10 * 60);
+
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 use Handlebars\Handlebars;
